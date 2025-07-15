@@ -51,3 +51,20 @@ export const useAdminCreateCustomer = (
     ...options,
   });
 };
+
+export const useAdminListCustomers = (
+  query?: Record<string, any>,
+  options?: UseQueryOptions<
+    { customers: AdminCustomer[] },
+    FetchError,
+    AdminCustomer[],
+    QueryKey
+  >
+) => {
+  return useQuery({
+    queryKey: customerQueryKey.list(query),
+    queryFn: () => sdk.admin.customer.list(query),
+    select: (data) => data.customers,
+    ...options,
+  });
+};

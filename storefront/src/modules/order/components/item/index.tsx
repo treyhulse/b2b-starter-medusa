@@ -12,12 +12,12 @@ type ItemProps = {
 
 const Item = ({ item, order }: ItemProps) => {
   return (
-    <tr className="flex gap-x-4">
-      <td className="w-20">
+    <div className="flex gap-x-4">
+      <div className="w-20">
         <Thumbnail thumbnail={item.thumbnail} size="square" />
-      </td>
+      </div>
 
-      <td className="flex flex-col w-full">
+      <div className="flex flex-col w-full">
         <div>
           <Text className="font-normal" data-testid="product-name">
             {item.product_title}
@@ -42,8 +42,8 @@ const Item = ({ item, order }: ItemProps) => {
             <ItemTotalPrice item={item} currencyCode={order.currency_code} />
           </div>
         </div>
-      </td>
-    </tr>
+      </div>
+    </div>
   )
 }
 

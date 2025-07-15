@@ -14,24 +14,24 @@ export const QuoteTableItem = ({
   currencyCode: string
 }) => {
   const isAddedItem = useMemo(
-    () => !!item.actions?.find((a) => a.action === "ITEM_ADD"),
+    () => !!(item?.actions ?? []).find((a) => a.action === "ITEM_ADD"),
     [item]
   )
 
   const isItemUpdated = useMemo(
-    () => !!item.actions?.find((a) => a.action === "ITEM_UPDATE"),
+    () => !!(item?.actions ?? []).find((a) => a.action === "ITEM_UPDATE"),
     [item]
   )
 
   const isItemRemoved = useMemo(() => {
-    const updateAction = item.actions?.find((a) => a.action === "ITEM_UPDATE")
+    const updateAction = (item?.actions ?? []).find((a) => a.action === "ITEM_UPDATE")
 
     return !!updateAction && item.quantity === item.detail.fulfilled_quantity
   }, [item])
 
   return (
     <div className="flex gap-x-4">
-      <Thumbnail thumbnail={item.thumbnail} size="square" className="w-16" />
+      <Thumbnail thumbnail={item?.thumbnail ?? ""} size="square" className="w-16" />
 
       <div className="flex flex-col w-full">
         <div>
@@ -41,23 +41,23 @@ export const QuoteTableItem = ({
             weight="plus"
             className="text-ui-fg-base"
           >
-            {item.product_title}
+            {item?.product_title ?? ""}
           </Text>
 
-          {item.variant_sku && (
+          {item?.variant_sku && (
             <div className="flex items-center gap-x-1">
-              <Text size="small">{item.variant_sku}</Text>
+              <Text size="small">{item?.variant_sku}</Text>
             </div>
           )}
           <Text size="small">
-            {item.variant?.options?.map((o) => o.value).join(" · ")}
+            {item?.variant?.options?.map((o) => o.value).join(" · ")}
           </Text>
         </div>
 
         <div className="flex justify-between w-full items-center">
           <div>
             <Text className="text-">
-              <span>{item.quantity}</span>x{" "}
+              <span>{item?.quantity ?? 0}</span>x{" "}
             </Text>
           </div>
 
@@ -65,7 +65,7 @@ export const QuoteTableItem = ({
             <AmountCell
               className="text-sm text-right justify-end items-end"
               currencyCode={currencyCode}
-              amount={item.unit_price}
+              amount={item?.unit_price ?? 0}
               originalAmount={originalItem?.unit_price}
             />
 
@@ -102,7 +102,7 @@ export const QuoteTableItem = ({
             <AmountCell
               className="text-sm text-right justify-end items-end"
               currencyCode={currencyCode}
-              amount={item.total}
+              amount={item?.total ?? 0}
               originalAmount={originalItem?.total}
             />
           </div>

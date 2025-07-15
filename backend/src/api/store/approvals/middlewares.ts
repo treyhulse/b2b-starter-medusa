@@ -44,13 +44,37 @@ const ensureApprovalType = async (
   next();
 };
 
+export const ensureEmployeeIsAdmin = async (
+  req: AuthenticatedMedusaRequest,
+  res: MedusaResponse,
+  next: MedusaNextFunction
+) => {
+  const { app_metadata } = req.auth_context;
+  const customer_id = app_metadata?.customer_id;
+  if (!customer_id) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+  const query = req.scope.resolve("query");
+  const {
+    data: [customer],
+  } = await query.graph({
+    entity: "customer",
+    fields: ["employee.is_admin"],
+    filters: { id: customer_id },
+  });
+  if (!customer?.employee?.is_admin) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+  next();
+};
+
 export const storeApprovalsMiddlewares: MiddlewareRoute[] = [
   {
     method: "ALL",
     matcher: "/store/approvals*",
     middlewares: [
       authenticate("customer", ["session", "bearer"]),
-      ensureRole("company_admin"),
+      ensureEmployeeIsAdmin,
     ],
   },
   {

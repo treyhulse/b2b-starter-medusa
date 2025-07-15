@@ -26,10 +26,8 @@ export async function NavigationHeader() {
               className="hover:text-ui-fg-base flex items-center w-fit"
               href="/"
             >
-              <h1 className="small:text-base text-sm font-medium flex items-center">
                 <LogoIcon className="inline mr-2" />
-                Medusa B2B Starter
-              </h1>
+
             </LocalizedClientLink>
 
             <nav>
@@ -38,6 +36,22 @@ export async function NavigationHeader() {
                   <Suspense fallback={<SkeletonMegaMenu />}>
                     <MegaMenuWrapper />
                   </Suspense>
+                </li>
+                <li>
+                  <LocalizedClientLink
+                    className="hover:text-ui-fg-base hover:bg-neutral-100 rounded-full px-3 py-2"
+                    href="/gondola-configurator"
+                  >
+                    Gondola Configurator
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink
+                    className="hover:text-ui-fg-base hover:bg-neutral-100 rounded-full px-3 py-2"
+                    href="/design-studio"
+                  >
+                    Design Studio
+                  </LocalizedClientLink>
                 </li>
               </ul>
             </nav>

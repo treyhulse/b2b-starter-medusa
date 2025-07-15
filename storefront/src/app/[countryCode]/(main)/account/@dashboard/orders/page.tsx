@@ -24,9 +24,17 @@ export default async function Orders() {
     approval_settings?.requires_admin_approval ||
     approval_settings?.requires_sales_manager_approval
 
-  const { carts_with_approvals } = await listApprovals({
-    status: ApprovalStatusType.PENDING,
-  })
+  let carts_with_approvals: any[] = []
+  try {
+    const result = await listApprovals({
+      status: ApprovalStatusType.PENDING,
+    })
+    carts_with_approvals = result.carts_with_approvals
+  } catch (err) {
+    // Optionally log error
+    // console.error('Failed to load approvals', err)
+    carts_with_approvals = []
+  }
 
   return (
     <div

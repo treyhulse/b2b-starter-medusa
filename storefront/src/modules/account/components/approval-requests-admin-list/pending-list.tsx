@@ -13,11 +13,22 @@ export default async function PendingApprovalRequestsAdminList({
   const currentPage = Number(searchParams[pageParam]) || 1
   const limit = 5
 
-  let { carts_with_approvals, count } = await listApprovals({
-    status: ApprovalStatusType.PENDING,
-    offset: (currentPage - 1) * limit,
-    limit,
-  })
+  let carts_with_approvals: any[] = []
+  let count = 0
+  try {
+    const result = await listApprovals({
+      status: ApprovalStatusType.PENDING,
+      offset: (currentPage - 1) * limit,
+      limit,
+    })
+    carts_with_approvals = result.carts_with_approvals
+    count = result.count
+  } catch (err) {
+    // Optionally log error
+    // console.error('Failed to load pending approvals', err)
+    carts_with_approvals = []
+    count = 0
+  }
 
   const totalPages = Math.ceil((count || 0) / limit)
 

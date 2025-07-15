@@ -4,7 +4,7 @@ import {
   validateAndTransformQuery,
 } from "@medusajs/framework";
 import { authenticate } from "@medusajs/medusa";
-import { ensureRole } from "../../middlewares/ensure-role";
+import { ensureEmployeeIsAdmin } from "../approvals/middlewares";
 import {
   storeCompanyQueryConfig,
   storeEmployeeQueryConfig,
@@ -82,7 +82,7 @@ export const storeCompaniesMiddlewares: MiddlewareRoute[] = [
     method: ["POST"],
     matcher: "/store/companies/:id/employees",
     middlewares: [
-      ensureRole("company_admin"),
+      ensureEmployeeIsAdmin,
       validateAndTransformBody(StoreCreateEmployee),
       validateAndTransformQuery(
         StoreGetEmployeeParams,
@@ -104,7 +104,7 @@ export const storeCompaniesMiddlewares: MiddlewareRoute[] = [
     method: ["POST"],
     matcher: "/store/companies/:id/employees/:employee_id",
     middlewares: [
-      ensureRole("company_admin"),
+      ensureEmployeeIsAdmin,
       validateAndTransformBody(StoreUpdateEmployee),
       validateAndTransformQuery(
         StoreGetEmployeeParams,
@@ -116,7 +116,7 @@ export const storeCompaniesMiddlewares: MiddlewareRoute[] = [
     method: ["POST"],
     matcher: "/store/companies/:id/approval-settings",
     middlewares: [
-      ensureRole("company_admin"),
+      ensureEmployeeIsAdmin,
       validateAndTransformBody(StoreUpdateApprovalSettings),
     ],
   },

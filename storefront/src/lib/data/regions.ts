@@ -14,7 +14,7 @@ export const listRegions = async (): Promise<HttpTypes.StoreRegion[]> => {
     .fetch<{ regions: HttpTypes.StoreRegion[] }>(`/store/regions`, {
       method: "GET",
       next,
-      cache: "force-cache",
+      cache: "no-cache",
     })
     .then(({ regions }: { regions: HttpTypes.StoreRegion[] }) => regions)
     .catch(medusaError)
@@ -31,7 +31,7 @@ export const retrieveRegion = async (
     .fetch<{ region: HttpTypes.StoreRegion }>(`/store/regions/${id}`, {
       method: "GET",
       next,
-      cache: "force-cache",
+      cache: "no-cache",
     })
     .then(({ region }: { region: HttpTypes.StoreRegion }) => region)
     .catch(medusaError)

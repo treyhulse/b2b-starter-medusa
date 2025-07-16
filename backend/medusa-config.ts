@@ -10,9 +10,9 @@ import {
   STRIPE_API_KEY,
   STRIPE_WEBHOOK_SECRET,
   BACKEND_URL,
-  REDIS_URL,
-  SENDGRID_API_KEY,
-  SENDGRID_FROM_EMAIL,
+  // REDIS_URL,
+  // SENDGRID_API_KEY,
+  // SENDGRID_FROM_EMAIL,
   RESEND_API_KEY,
   RESEND_FROM_EMAIL,
   MEILISEARCH_HOST,
@@ -51,6 +51,9 @@ export default defineConfig({
       resolve: "./modules/approval",
       options: {},
       definition: { isQueryable: true },
+    },
+    {
+      resolve: "./modules/brand",
     },
     // Dynamic modules
     {

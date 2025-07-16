@@ -88,7 +88,7 @@ export const OrderPlacedTemplate: React.FC<OrderPlacedTemplateProps> & {
             <Text style={{ fontWeight: 'bold' }}>Quantity</Text>
             <Text style={{ fontWeight: 'bold' }}>Price</Text>
           </div>
-          {order.items.map((item) => (
+          {order.items?.map((item) => (
             <div key={item.id} style={{
               display: 'flex',
               justifyContent: 'space-between',

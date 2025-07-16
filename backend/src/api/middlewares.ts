@@ -2,10 +2,13 @@ import {
   MedusaNextFunction,
   MedusaRequest,
   MedusaResponse,
+  validateAndTransformBody,
 } from "@medusajs/framework";
 import { defineMiddlewares } from "@medusajs/medusa";
 import { adminMiddlewares } from "./admin/middlewares";
 import { storeMiddlewares } from "./store/middlewares";
+import { PostAdminCreateBrand } from "./admin/brands/validators";
+import { z } from "zod";
 
 export default defineMiddlewares({
   routes: [
@@ -19,6 +22,20 @@ export default defineMiddlewares({
           next();
         },
       ],
+    },
+    {
+      matcher: "/admin/brands",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreateBrand),
+      ],
+    },
+    {
+      matcher: "/admin/products",
+      method: ["POST"],
+      additionalDataValidator: {
+        brand_id: z.string().optional(),
+      },
     },
   ],
 });

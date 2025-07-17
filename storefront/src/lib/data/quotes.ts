@@ -109,7 +109,7 @@ export const acceptQuote = async (id: string) => {
       method: "POST",
       body: {},
       headers,
-      cache: "no-store",
+      cache: "force-cache",
     })
     .then((res) => {
       track("quote_accepted", {
@@ -138,7 +138,7 @@ export const rejectQuote = async (id: string) => {
       method: "POST",
       body: {},
       headers,
-      cache: "no-store",
+      cache: "force-cache",
     })
     .finally(async () => {
       const tags = await Promise.all([
@@ -163,7 +163,7 @@ export const createQuoteMessage = async (
       method: "POST",
       body,
       headers,
-      cache: "no-store",
+      cache: "force-cache",
     })
     .then((res) => {
       track("quote_message_created", {

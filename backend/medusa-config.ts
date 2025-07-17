@@ -1,6 +1,8 @@
 import { QUOTE_MODULE } from "./src/modules/quote";
 import { APPROVAL_MODULE } from "./src/modules/approval";
 import { COMPANY_MODULE } from "./src/modules/company";
+import { BRAND_MODULE } from "./src/modules/brand";
+
 import { loadEnv, defineConfig, Modules } from "@medusajs/framework/utils";
 import {
   MINIO_ACCESS_KEY,
@@ -53,7 +55,10 @@ export default defineConfig({
       definition: { isQueryable: true },
     },
     {
+      key: BRAND_MODULE,
       resolve: "./modules/brand",
+      options: {},
+      definition: { isQueryable: true },
     },
     // Dynamic modules
     {

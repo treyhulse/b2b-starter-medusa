@@ -1,36 +1,25 @@
-import { INotificationModuleService, IUserModuleService } from '@medusajs/framework/types'
-import { Modules } from '@medusajs/framework/utils'
 import { SubscriberArgs, SubscriberConfig } from '@medusajs/framework'
-import { BACKEND_URL } from '../lib/constants'
-import { EmailTemplates } from '../modules/email-notifications/templates'
+import { inviteCustomerToCompanyWorkflow } from '../workflows/company/workflows/invite-customer-to-company'
 
 export default async function userInviteHandler({
     event: { data },
     container,
   }: SubscriberArgs<any>) {
-
-  const notificationModuleService: INotificationModuleService = container.resolve(
-    Modules.NOTIFICATION,
-  )
-  const userModuleService: IUserModuleService = container.resolve(Modules.USER)
-  const invite = await userModuleService.retrieveInvite(data.id)
-
+  console.log('invite-created subscriber TRIGGERED')
+  console.log('Payload:', JSON.stringify(data, null, 2))
   try {
-    await notificationModuleService.createNotifications({
-      to: invite.email,
-      channel: 'email',
-      template: EmailTemplates.INVITE_USER,
-      data: {
-        emailOptions: {
-          replyTo: 'info@example.com',
-          subject: "You've been invited to Medusa!"
-        },
-        inviteLink: `${BACKEND_URL}/app/invite?token=${invite.token}`,
-        preview: 'The administration dashboard awaits...'
-      }
+    const { email, companyId, customerDetails } = data
+    console.log('Running inviteCustomerToCompanyWorkflow with:', { email, companyId, customerDetails })
+    const { result } = await inviteCustomerToCompanyWorkflow(container).run({
+      input: {
+        email,
+        companyId,
+        customerDetails,
+      },
     })
+    console.log('Invite workflow result:', result)
   } catch (error) {
-    console.error(error)
+    console.error('Error running invite workflow:', error)
   }
 }
 

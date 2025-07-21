@@ -2,6 +2,7 @@ import { createStep, createWorkflow, StepResponse, WorkflowResponse } from "@med
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 import { EmailTemplates } from "../../../modules/email-notifications/templates"
 import { BACKEND_URL } from "../../../lib/constants"
+import { ICompanyModuleService } from '../../../types/company/service'
 
 export type InviteCustomerToCompanyInput = {
   email: string
@@ -39,7 +40,7 @@ const findOrCreateCustomerStep = createStep(
     // console.log('[Workflow] findOrCreateCustomerStep START', input)
     const query = container.resolve(ContainerRegistrationKeys.QUERY)
     const customerModuleService = container.resolve('customer')
-    const companyModuleService = container.resolve('company')
+    const companyModuleService = container.resolve<ICompanyModuleService>('company')
 
     // 1. Try to find customer by email
     const { data: customers } = await query.graph({

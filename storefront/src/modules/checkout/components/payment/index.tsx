@@ -34,6 +34,7 @@ const Payment = ({
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
     activeSession?.provider_id ?? ""
   )
+  const [paymentSessionCreated, setPaymentSessionCreated] = useState(false)
 
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -50,6 +51,25 @@ const Payment = ({
 
   const paymentReady =
     (activeSession && cart?.shipping_methods.length !== 0) || paidByGiftcard
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[Payment Component] Debug info:', {
+      hasCart: !!cart,
+      cartId: cart?.id,
+      hasPaymentCollection: !!cart?.payment_collection,
+      hasActiveSession: !!activeSession,
+      activeSessionProvider: activeSession?.provider_id,
+      availablePaymentMethods: availablePaymentMethods?.length || 0,
+      paymentMethods: availablePaymentMethods?.map(p => p.id),
+      stripeReady,
+      isOpen,
+      paymentReady,
+      selectedPaymentMethod,
+      cartApprovalStatus,
+      paymentSessionCreated
+    })
+  }, [cart, activeSession, availablePaymentMethods, stripeReady, isOpen, paymentReady, selectedPaymentMethod, cartApprovalStatus, paymentSessionCreated])
 
   const useOptions: StripeCardElementOptions = useMemo(() => {
     return {
@@ -84,6 +104,30 @@ const Payment = ({
     })
   }
 
+  const handlePaymentMethodSelect = async (value: string) => {
+    console.log('[Payment Component] Payment method selected:', value)
+    setSelectedPaymentMethod(value)
+    setError(null)
+
+    // If Stripe is selected and no active session exists, create one
+    if (isStripeFunc(value) && !activeSession) {
+      setIsLoading(true)
+      try {
+        console.log('[Payment Component] Creating payment session for Stripe')
+        await initiatePaymentSession(cart, {
+          provider_id: value,
+        })
+        setPaymentSessionCreated(true)
+        console.log('[Payment Component] Payment session created successfully')
+      } catch (err: any) {
+        console.error('[Payment Component] Error creating payment session:', err)
+        setError(err.message)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+  }
+
   const handleSubmit = async () => {
     setIsLoading(true)
     try {
@@ -94,6 +138,7 @@ const Payment = ({
         !activeSession ||
         activeSession.provider_id !== selectedPaymentMethod
       ) {
+        console.log('[Payment Component] Initiating payment session for:', selectedPaymentMethod)
         await initiatePaymentSession(cart, {
           provider_id: selectedPaymentMethod,
         })
@@ -108,6 +153,7 @@ const Payment = ({
         )
       }
     } catch (err: any) {
+      console.error('[Payment Component] Error initiating payment session:', err)
       setError(err.message)
     } finally {
       setIsLoading(false)
@@ -117,6 +163,23 @@ const Payment = ({
   useEffect(() => {
     setError(null)
   }, [isOpen])
+
+  // Show loading state while creating payment session
+  if (isLoading) {
+    return (
+      <Container>
+        <div className="flex flex-col gap-y-2">
+          <Heading level="h2" className="flex flex-row text-xl gap-x-2 items-center">
+            Payment Method
+          </Heading>
+          <Divider />
+          <div className="flex items-center justify-center py-8">
+            <Text>Setting up payment method...</Text>
+          </div>
+        </div>
+      </Container>
+    )
+  }
 
   return (
     <Container>
@@ -154,7 +217,7 @@ const Payment = ({
             <>
               <RadioGroup
                 value={selectedPaymentMethod}
-                onChange={(value: string) => setSelectedPaymentMethod(value)}
+                onChange={handlePaymentMethodSelect}
               >
                 {availablePaymentMethods
                   .sort((a, b) => {
@@ -171,6 +234,8 @@ const Payment = ({
                     )
                   })}
               </RadioGroup>
+              
+              {/* Show Stripe elements if Stripe is selected and ready */}
               {stripeReady && selectedPaymentMethod === "pp_stripe_stripe" && (
                 <div className="mt-5 transition-all duration-150 ease-in-out">
                   <Text className="txt-medium-plus text-ui-fg-base mb-1">
@@ -188,6 +253,18 @@ const Payment = ({
                       setCardComplete(e.complete)
                     }}
                   />
+                </div>
+              )}
+              
+              {/* Show message if Stripe is selected but not ready */}
+              {!stripeReady && selectedPaymentMethod === "pp_stripe_stripe" && (
+                <div className="mt-5 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <Text className="text-yellow-800">
+                    {!activeSession 
+                      ? "Please wait while we set up your payment method..." 
+                      : "Stripe is not ready. Please check your environment configuration."
+                    }
+                  </Text>
                 </div>
               )}
             </>

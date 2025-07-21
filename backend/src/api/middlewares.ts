@@ -9,6 +9,7 @@ import { adminMiddlewares } from "./admin/middlewares";
 import { storeMiddlewares } from "./store/middlewares";
 import { PostAdminCreateBrand } from "./admin/brands/validators";
 import { z } from "zod";
+import { SearchSchema } from "./store/products/search/route";
 
 export default defineMiddlewares({
   routes: [
@@ -36,6 +37,13 @@ export default defineMiddlewares({
       additionalDataValidator: {
         brand_id: z.string().optional(),
       },
+    },
+    {
+      matcher: "/store/products/search",
+      method: ["POST"],
+      middlewares: [
+        validateAndTransformBody(SearchSchema),
+      ],
     },
   ],
 });

@@ -9,6 +9,19 @@ const requiredEnvs = [
   },
 ]
 
+const optionalEnvs = [
+  {
+    key: "NEXT_PUBLIC_STRIPE_KEY",
+    description:
+      "Stripe publishable key for payment processing. Get it from your Stripe dashboard.",
+  },
+  {
+    key: "NEXT_PUBLIC_PAYPAL_CLIENT_ID",
+    description:
+      "PayPal client ID for payment processing. Get it from your PayPal developer dashboard.",
+  },
+]
+
 function checkEnvVariables() {
   const missingEnvs = requiredEnvs.filter(function (env) {
     return !process.env[env.key]
@@ -33,6 +46,30 @@ function checkEnvVariables() {
     )
 
     process.exit(1)
+  }
+
+  // Check optional envs and warn if missing
+  const missingOptionalEnvs = optionalEnvs.filter(function (env) {
+    return !process.env[env.key]
+  })
+
+  if (missingOptionalEnvs.length > 0) {
+    console.warn(
+      c.yellow.bold("\n⚠️  Warning: Missing optional environment variables\n")
+    )
+
+    missingOptionalEnvs.forEach(function (env) {
+      console.warn(c.yellow(`  ${c.bold(env.key)}`))
+      if (env.description) {
+        console.warn(c.dim(`    ${env.description}\n`))
+      }
+    })
+
+    console.warn(
+      c.yellow(
+        "\nThese are optional but required for specific payment methods to work.\n"
+      )
+    )
   }
 }
 

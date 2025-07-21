@@ -24,11 +24,24 @@ const Wrapper: React.FC<WrapperProps> = ({ cart, children }) => {
     (s) => s.status === "pending"
   )
 
+  // Debug logging
+  console.log('[PaymentWrapper] Debug info:', {
+    hasPaymentSession: !!paymentSession,
+    paymentSessionProvider: paymentSession?.provider_id,
+    isStripeProvider: isStripe(paymentSession?.provider_id),
+    hasStripeKey: !!stripeKey,
+    hasStripePromise: !!stripePromise,
+    cartId: cart.id,
+    paymentCollectionId: cart.payment_collection?.id
+  })
+
   if (
     isStripe(paymentSession?.provider_id) &&
     paymentSession &&
-    stripePromise
+    stripePromise &&
+    stripeKey
   ) {
+    console.log('[PaymentWrapper] Initializing Stripe wrapper')
     return (
       <StripeContext.Provider value={true}>
         <StripeWrapper
@@ -47,6 +60,7 @@ const Wrapper: React.FC<WrapperProps> = ({ cart, children }) => {
     paypalClientId !== undefined &&
     cart
   ) {
+    console.log('[PaymentWrapper] Initializing PayPal wrapper')
     return (
       <PayPalScriptProvider
         options={{
@@ -61,6 +75,8 @@ const Wrapper: React.FC<WrapperProps> = ({ cart, children }) => {
     )
   }
 
+  // If no payment session or provider not supported, render without wrapper
+  console.log('[PaymentWrapper] No payment wrapper needed, rendering children directly')
   return <div>{children}</div>
 }
 

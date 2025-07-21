@@ -2,6 +2,7 @@ import { QUOTE_MODULE } from "./src/modules/quote";
 import { APPROVAL_MODULE } from "./src/modules/approval";
 import { COMPANY_MODULE } from "./src/modules/company";
 import { BRAND_MODULE } from "./src/modules/brand";
+import { ALGOLIA_MODULE } from "./src/modules/algolia";
 
 import { loadEnv, defineConfig, Modules } from "@medusajs/framework/utils";
 import {
@@ -12,7 +13,7 @@ import {
   STRIPE_API_KEY,
   STRIPE_WEBHOOK_SECRET,
   BACKEND_URL,
-  // REDIS_URL,
+  REDIS_URL,
   // SENDGRID_API_KEY,
   // SENDGRID_FROM_EMAIL,
   RESEND_API_KEY,
@@ -59,6 +60,31 @@ export default defineConfig({
       resolve: "./modules/brand",
       options: {},
       definition: { isQueryable: true },
+    },
+    {
+      key: ALGOLIA_MODULE,
+        resolve: "./src/modules/algolia",
+        options: {
+          appId: process.env.ALGOLIA_APP_ID,
+          apiKey: process.env.ALGOLIA_API_KEY,
+          productIndexName: process.env.ALGOLIA_PRODUCT_INDEX_NAME,
+        },
+      definition: { isQueryable: true },
+    },
+    {
+      key: Modules.PAYMENT,
+      resolve: "@medusajs/medusa/payment",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/medusa/payment-stripe",
+            id: "stripe",
+            options: {
+              apiKey: process.env.STRIPE_API_KEY,
+            },
+          },
+        ],
+      },
     },
     // Dynamic modules
     {
@@ -138,6 +164,7 @@ export default defineConfig({
           },
         ]
       : []),
+      /*
     ...(STRIPE_API_KEY && STRIPE_WEBHOOK_SECRET
       ? [
           {
@@ -157,7 +184,7 @@ export default defineConfig({
             },
           },
         ]
-      : []),
+      : []),*/
   ],
   plugins: [
     ...(MEILISEARCH_HOST && MEILISEARCH_ADMIN_KEY

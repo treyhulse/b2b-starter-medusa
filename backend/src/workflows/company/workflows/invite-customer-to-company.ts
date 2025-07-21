@@ -36,7 +36,7 @@ type InviteCustomerToCompanyOutput = {
 const findOrCreateCustomerStep = createStep(
   "find-or-create-customer",
   async (input: InviteCustomerToCompanyInput, { container }) => {
-    console.log('[Workflow] findOrCreateCustomerStep START', input)
+    // console.log('[Workflow] findOrCreateCustomerStep START', input)
     const query = container.resolve(ContainerRegistrationKeys.QUERY)
     const customerModuleService = container.resolve('customer')
     const companyModuleService = container.resolve('company')
@@ -44,7 +44,7 @@ const findOrCreateCustomerStep = createStep(
     // 1. Try to find customer by email
     const { data: customers } = await query.graph({
       entity: "customer",
-      filters: { email: input.email },
+      filters: { email: input.email } as any,
       fields: ["id", "email"]
     })
     let customerId: string
@@ -81,7 +81,7 @@ const findOrCreateCustomerStep = createStep(
       employeeId: employee.id,
       inviteToken,
     }
-    console.log('[Workflow] findOrCreateCustomerStep RESULT', result)
+    // console.log('[Workflow] findOrCreateCustomerStep RESULT', result)
     return new StepResponse<FindOrCreateCustomerOutput>(result)
   }
 )
@@ -90,7 +90,7 @@ const findOrCreateCustomerStep = createStep(
 const sendInviteEmailStep = createStep(
   "send-invite-email",
   async (input: FindOrCreateCustomerOutput, { container }) => {
-    console.log('[Workflow] sendInviteEmailStep START', input)
+    // console.log('[Workflow] sendInviteEmailStep START', input)
     const notificationModuleService = container.resolve('notification')
     // Compose invite link
     const inviteLink = `${BACKEND_URL}/app/invite?token=${input.inviteToken}`
@@ -108,7 +108,7 @@ const sendInviteEmailStep = createStep(
       },
     })
     const result = { invited: true, email: input.email }
-    console.log('[Workflow] sendInviteEmailStep RESULT', result)
+    // console.log('[Workflow] sendInviteEmailStep RESULT', result)
     return new StepResponse<SendInviteEmailOutput>(result)
   }
 )
@@ -120,7 +120,7 @@ export const inviteCustomerToCompanyWorkflow = createWorkflow(
     retentionTime: 86400,
   },
   function (input: InviteCustomerToCompanyInput) {
-    console.log('[Workflow] inviteCustomerToCompanyWorkflow START', input)
+    // console.log('[Workflow] inviteCustomerToCompanyWorkflow START', input)
     const customer = findOrCreateCustomerStep(input)
     const invite = sendInviteEmailStep(customer)
     const result = {
@@ -129,7 +129,7 @@ export const inviteCustomerToCompanyWorkflow = createWorkflow(
       employeeId: customer.employeeId,
       customerId: customer.customerId,
     }
-    console.log('[Workflow] inviteCustomerToCompanyWorkflow RESULT', result)
+    // console.log('[Workflow] inviteCustomerToCompanyWorkflow RESULT', result)
     return new WorkflowResponse<InviteCustomerToCompanyOutput>(result)
   }
 )

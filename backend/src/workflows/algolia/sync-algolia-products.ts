@@ -1,7 +1,7 @@
 import { createWorkflow, WorkflowResponse } from "@medusajs/framework/workflows-sdk"
 import { useQueryGraphStep } from "@medusajs/medusa/core-flows"
 import { ProductStatus } from "@medusajs/framework/utils"
-import { syncProductsStep, SyncProductsStepInput } from "./steps/sync-products"
+import { syncAlgoliaProductsStep, SyncProductsStepInput } from "./steps/sync-algolia-products-step"
 
 type SyncProductsWorkflowInput = {
   limit?: number
@@ -15,9 +15,9 @@ type SyncProductsWorkflowOutput = {
   success: boolean
 }
 
-export const syncProductsWorkflow = createWorkflow(
+export const syncAlgoliaProductsWorkflow = createWorkflow(
   {
-    name: "sync-products",
+    name: "sync-algolia-products",
     store: true,
     retentionTime: 86400, // 24 hours
   },
@@ -56,7 +56,7 @@ export const syncProductsWorkflow = createWorkflow(
         })
       }
 
-      const syncResult = syncProductsStep({
+      const syncResult = syncAlgoliaProductsStep({
         products: data,
       } as SyncProductsStepInput)
 

@@ -1,0 +1,59 @@
+import { createWorkflow, transform, WorkflowResponse } from "@medusajs/framework/workflows-sdk"
+import { createProductsWorkflow, updateProductsWorkflow, useQueryGraphStep } from "@medusajs/medusa/core-flows"
+
+export const importProductsFromNetSuiteWorkflow = createWorkflow(
+  {
+    name: "import-products-from-netsuite",
+    store: true,
+    retentionTime: 86400,
+  },
+  (input) => {
+    // 1. Fetch products from NetSuite
+    const netsuiteProducts = importProductsFromNetSuiteStep(input)
+
+    // 2. Fetch existing Medusa products by external_id
+    const externalIds = transform({ netsuiteProducts }, (data) =>
+      data.netsuiteProducts.map((p) => p.itemId)
+    )
+    const { data: existingProducts } = useQueryGraphStep({
+      entity: "product",
+      fields: ["id", "external_id", "variants.id", "variants.metadata"],
+      filters: { external_id: externalIds },
+    })
+
+    // 3. Transform NetSuite products to Medusa format and split into create/update
+    const { productsToCreate, productsToUpdate } = transform(
+      { netsuiteProducts, existingProducts },
+      (data) => {
+        const toCreate = []
+        const toUpdate = []
+        data.netsuiteProducts.forEach((nsProduct) => {
+          // Map NetSuite to Medusa product
+          const medusaProduct = {
+            title: nsProduct.displayName,
+            description: nsProduct.description,
+            status: nsProduct.isInactive ? "draft" : "published",
+            external_id: nsProduct.itemId,
+            // ...other fields and mapping
+          }
+          const existing = data.existingProducts.find(
+            (p) => p.external_id === nsProduct.itemId
+          )
+          if (existing) {
+            medusaProduct.id = existing.id
+            toUpdate.push(medusaProduct)
+          } else {
+            toCreate.push(medusaProduct)
+          }
+        })
+        return { productsToCreate: toCreate, productsToUpdate: toUpdate }
+      }
+    )
+
+    // 4. Upsert products in Medusa
+    createProductsWorkflow.runAsStep({ input: { products: productsToCreate } })
+    updateProductsWorkflow.runAsStep({ input: { products: productsToUpdate } })
+
+    return new WorkflowResponse({ success: true })
+  }
+)

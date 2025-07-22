@@ -3,6 +3,7 @@ import { APPROVAL_MODULE } from "./src/modules/approval";
 import { COMPANY_MODULE } from "./src/modules/company";
 import { BRAND_MODULE } from "./src/modules/brand";
 import { ALGOLIA_MODULE } from "./src/modules/algolia";
+import { NETSUITE_MODULE } from "./src/modules/netsuite";
 
 import { loadEnv, defineConfig, Modules } from "@medusajs/framework/utils";
 import {
@@ -69,6 +70,18 @@ export default defineConfig({
           apiKey: process.env.ALGOLIA_API_KEY,
           productIndexName: process.env.ALGOLIA_PRODUCT_INDEX_NAME,
         },
+      definition: { isQueryable: true },
+    },
+    {
+      key: NETSUITE_MODULE,
+      resolve: "./src/modules/netsuite",
+      options: {
+        consumerKey: process.env.NETSUITE_CONSUMER_KEY,
+        consumerSecret: process.env.NETSUITE_CONSUMER_SECRET,
+        tokenId: process.env.NETSUITE_TOKEN_ID,
+        tokenSecret: process.env.NETSUITE_TOKEN_SECRET,
+        realm: process.env.NETSUITE_REALM,
+      },
       definition: { isQueryable: true },
     },
     {

@@ -2,7 +2,7 @@ import {
     SubscriberArgs,
     type SubscriberConfig,
   } from "@medusajs/framework"
-  import { syncProductsWorkflow } from "../workflows/sync-products"
+  import { syncAlgoliaProductsWorkflow } from "../workflows/algolia/sync-algolia-products"
   
   export default async function algoliaSyncHandler({ 
     container,
@@ -24,7 +24,7 @@ import {
         logger.info(`[Algolia Sync] Processing batch: offset=${offset}, limit=${limit}`)
         console.log(`[Algolia Sync] Processing batch: offset=${offset}, limit=${limit}`)
         
-        const { result } = await syncProductsWorkflow(container)
+        const { result } = await syncAlgoliaProductsWorkflow(container)
           .run({
             input: {
               limit,

@@ -1,14 +1,14 @@
 import { ProductDTO } from "@medusajs/framework/types"
 import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
-import { ALGOLIA_MODULE } from "../../modules/algolia"
-import AlgoliaModuleService from "../../modules/algolia/service"
+import { ALGOLIA_MODULE } from "../../../modules/algolia"
+import AlgoliaModuleService from "../../../modules/algolia/service"
 
 export type SyncProductsStepInput = {
   products: ProductDTO[]
 }
 
-export const syncProductsStep = createStep(
-  "sync-products",
+export const syncAlgoliaProductsStep = createStep(
+  "sync-algolia-products",
   async ({ products }: SyncProductsStepInput, { container }) => {
     console.log('[Workflow Step] syncProductsStep START', { 
       productCount: products?.length || 0 
